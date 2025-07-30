@@ -7,15 +7,8 @@
       "dependencies": {},
       "hash": "d9a1a3cc5c997fe7a9ea171a9a3970d24793dba4"
     },
-    "com.kylewbanks.scenerefattribute": {
-      "version": "https://github.com/KyleBanks/scene-ref-attribute.git",
-      "depth": 0,
-      "source": "git",
-      "dependencies": {},
-      "hash": "8d3a0ee421588faaf373e0fe4b8f4577a522f029"
-    },
     "com.unity.ai.navigation": {
-      "version": "2.0.4",
+      "version": "2.0.8",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -67,16 +60,6 @@
       "depth": 1,
       "source": "registry",
       "dependencies": {},
-      "url": "https://packages.unity.com"
-    },
-    "com.unity.film-internal-utilities": {
-      "version": "0.19.2-preview",
-      "depth": 1,
-      "source": "registry",
-      "dependencies": {
-        "com.unity.timeline": "1.2.18",
-        "com.unity.modules.uielements": "1.0.0"
-      },
       "url": "https://packages.unity.com"
     },
     "com.unity.ide.rider": {
@@ -235,16 +218,6 @@
         "com.unity.modules.director": "1.0.0",
         "com.unity.modules.animation": "1.0.0",
         "com.unity.modules.particlesystem": "1.0.0"
-      },
-      "url": "https://packages.unity.com"
-    },
-    "com.unity.toonshader": {
-      "version": "0.11.1-preview",
-      "depth": 0,
-      "source": "registry",
-      "dependencies": {
-        "com.unity.render-pipelines.core": "10.0.0",
-        "com.unity.film-internal-utilities": "0.19.2-preview"
       },
       "url": "https://packages.unity.com"
     },
