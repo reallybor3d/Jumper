@@ -2,14 +2,13 @@ using UnityEngine;
 
 namespace Jumper
 {
+    [RequireComponent(typeof(Rigidbody))]
     public class MovementScript : MonoBehaviour
     {
         [Header("Movement Settings")]
         public float speed = 8f;
         public float rotationSpeed = 720f;
-        public float jumpSpeed = 10f;
-
-        private float ySpeed = 0f;
+        public float jumpForce = 10f;
 
         [Header("Physics Settings")]
         public float gravityMultiplier = 2.5f;
@@ -18,67 +17,73 @@ namespace Jumper
         private bool canDoubleJump = false;
         [HideInInspector] public bool hasDoubleJumpPowerup = false;
 
-        [Header("Camera Reference")]
-        public Transform cameraTransform;
+        private Rigidbody rb;
+        private CapsuleCollider col;
 
-        private CharacterController controller;
+        private Vector3 moveDirection;
+        private bool jumpRequested = false;
+        private bool isGrounded = false;
 
         void Start()
         {
-            controller = GetComponent<CharacterController>();
+            rb = GetComponent<Rigidbody>();
+            col = GetComponent<CapsuleCollider>();
+            rb.constraints = RigidbodyConstraints.FreezeRotation;
         }
-
-        //if you're reading this great job :O you found the secret
 
         void Update()
         {
             float horizontal = Input.GetAxis("Horizontal");
             float vertical = Input.GetAxis("Vertical");
 
-            // input to camera movement
-            Vector3 camForward = Vector3.ProjectOnPlane(cameraTransform.forward, Vector3.up).normalized;
-            Vector3 camRight = Vector3.ProjectOnPlane(cameraTransform.right, Vector3.up).normalized;
+            moveDirection = new Vector3(horizontal, 0f, vertical);
+            if (moveDirection.sqrMagnitude > 1f)
+                moveDirection.Normalize();
 
-            Vector3 inputDirection = (camForward * vertical + camRight * horizontal);
-            if (inputDirection.sqrMagnitude > 1f)
+            // Rotate to face direction
+            if (moveDirection.sqrMagnitude > 0.001f)
             {
-                inputDirection.Normalize();
+                Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
+                transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
             }
 
-            // Apply gravity and jump logic
-            if (controller.isGrounded)
+            if (Input.GetButtonDown("Jump"))
             {
-                ySpeed = -0.5f;
-                canDoubleJump = hasDoubleJumpPowerup;
+                jumpRequested = true;
+            }
+        }
 
-                if (Input.GetButtonDown("Jump"))
+        void FixedUpdate()
+        {
+            // Manual ground check
+            isGrounded = Physics.Raycast(transform.position, Vector3.down, col.bounds.extents.y + 0.1f);
+
+            // Move player
+            Vector3 move = moveDirection * speed;
+            move.y = rb.linearVelocity.y; // preserve vertical velocity
+            rb.linearVelocity = move;
+
+            // Handle jump
+            if (jumpRequested)
+            {
+                if (isGrounded)
                 {
-                    ySpeed = jumpSpeed;
+                    rb.linearVelocity = new Vector3(rb.linearVelocity.x, jumpForce, rb.linearVelocity.z);
+                    canDoubleJump = hasDoubleJumpPowerup;
                 }
-            }
-            else
-            {
-                ySpeed += (ySpeed < 0)
-                    ? Physics.gravity.y * gravityMultiplier * Time.deltaTime
-                    : Physics.gravity.y * Time.deltaTime;
-
-                if (Input.GetButtonDown("Jump") && canDoubleJump)
+                else if (canDoubleJump)
                 {
-                    ySpeed = jumpSpeed;
+                    rb.linearVelocity = new Vector3(rb.linearVelocity.x, jumpForce, rb.linearVelocity.z);
                     canDoubleJump = false;
                 }
+
+                jumpRequested = false;
             }
 
-            // Final movement
-            Vector3 velocity = inputDirection * speed;
-            velocity.y = ySpeed;
-            controller.Move(velocity * Time.deltaTime);
-
-            // Rotate character to face movement direction
-            if (inputDirection.sqrMagnitude > 0.001f)
+            // Apply extra gravity if falling
+            if (!isGrounded && rb.linearVelocity.y < 0)
             {
-                Quaternion targetRotation = Quaternion.LookRotation(inputDirection, Vector3.up);
-                transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+                rb.linearVelocity += Vector3.up * Physics.gravity.y * (gravityMultiplier - 1) * Time.fixedDeltaTime;
             }
         }
     }

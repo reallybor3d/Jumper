@@ -2,6 +2,9 @@ using UnityEngine;
 
 namespace Jumper
 {
+
+        //NOT BEING USED 
+
     [RequireComponent(typeof(Camera))]
     public class OrbitCamera : MonoBehaviour
     {
