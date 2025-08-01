@@ -2,20 +2,15 @@ using UnityEngine;
 
 namespace Jumper
 {
-    public class DoubleJumpPowerup : MonoBehaviour
+    public class DoubleJump : MonoBehaviour
     {
         void OnTriggerEnter(Collider other)
         {
-            if (other.CompareTag("Player"))
+            PowerupManager manager = other.GetComponent<PowerupManager>();
+            if (manager != null)
             {
-                MovementScript movement = other.GetComponent<MovementScript>();
-                if (movement != null)
-                {
-                    movement.hasDoubleJumpPowerup = true; 
-                    Debug.Log("Double jump power-up collected!");
-                }
-
-                Destroy(gameObject); 
+                manager.EnableDoubleJump();
+                Destroy(gameObject);
             }
         }
     }
