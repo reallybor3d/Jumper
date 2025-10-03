@@ -6,8 +6,8 @@ namespace Jumper
     {
         [Header("Powerup States")]
         public bool hasDoubleJump = false;
-        // You can add more later like:
-        // public bool hasSpeedBoost = false;
+        public bool hasSuperJump = false;
+        public bool hasGlider = false;
 
         public void EnableDoubleJump()
         {
@@ -15,6 +15,16 @@ namespace Jumper
             Debug.Log("Double Jump Enabled!");
         }
 
-        // Add other powerup methods here
+        public void EnableSuperJump()
+        {
+            hasSuperJump = true;
+            Debug.Log("Super Jump Enabled!");
+        }
+
+        public void EnableGlider()
+        {
+            hasGlider = true;
+            Debug.Log("Glider Enabled!");
+        }
     }
 }

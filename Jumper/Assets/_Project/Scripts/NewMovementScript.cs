@@ -66,18 +66,21 @@ namespace Jumper
 
         private void Update()
         {
-            //ground check
             grounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.2f, whatIsGround);
 
             MyInput();
             SpeedControl();
             StateHandler();
 
-            //drag handeling
             if (grounded)
                 rb.linearDamping = groundDrag;
             else
                 rb.linearDamping = 0;
+
+            if (!grounded && powerupManager != null && powerupManager.hasGlider && rb.linearVelocity.y < 0)
+            {
+                rb.AddForce(Vector3.up * Mathf.Abs(rb.linearVelocity.y) * 0.5f, ForceMode.Force);
+            }
 
             if (grounded)
                 jumpCount = 0;
@@ -94,7 +97,7 @@ namespace Jumper
             verticalInput = Input.GetAxisRaw("Vertical");
 
             //jump
-            if (Input.GetKey(jumpKey) && readyToJump && jumpCount < GetMaxJumps())
+            if (Input.GetKeyDown(jumpKey) && readyToJump && jumpCount < GetMaxJumps()) // Change GetKey to GetKeyDown
             {
                 readyToJump = false;
 
@@ -187,13 +190,17 @@ namespace Jumper
 
         private void Jump()
         {
-
             exitingSlope = true;
 
-            // reset y velocity
             rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
 
-            rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
+            float currentJumpForce = jumpForce;
+            if (powerupManager != null && powerupManager.hasSuperJump)
+            {
+                currentJumpForce *= 3f; 
+            }
+
+            rb.AddForce(transform.up * currentJumpForce, ForceMode.Impulse);
 
         }
 
